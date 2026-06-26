@@ -18,8 +18,20 @@ def run(cmd: list[str], cwd: Path) -> bool:
     except (subprocess.CalledProcessError, FileNotFoundError) as exc:
         print(f"failed: {' '.join(cmd)}")
         if isinstance(exc, subprocess.CalledProcessError):
-            print(exc.stderr.decode(errors="ignore")[-1200:])
+            stderr = exc.stderr.decode(errors="ignore")[-1200:]
+            print(stderr)
         return False
+
+
+def print_latex_error(log_file: Path) -> None:
+    if not log_file.exists():
+        return
+    lines = log_file.read_text(errors="ignore").splitlines()
+    for index, line in enumerate(lines):
+        if line.startswith("!") or "LaTeX Error" in line:
+            excerpt = lines[max(0, index - 2) : index + 8]
+            print("\n".join(excerpt))
+            return
 
 
 def main() -> None:
@@ -27,6 +39,8 @@ def main() -> None:
     SVG_OUT.mkdir(parents=True, exist_ok=True)
     PNG_OUT.mkdir(parents=True, exist_ok=True)
     shutil.copy2(OUT / "components.tex", BUILD / "components.tex")
+    if (FIGURES / "orig").exists():
+        shutil.copytree(FIGURES / "orig", BUILD / "figures" / "orig", dirs_exist_ok=True)
     rendered = 0
     for tikz in sorted(FIGURES.glob("*.tex")):
         key = tikz.stem
@@ -34,7 +48,7 @@ def main() -> None:
         rel = tikz.relative_to(BUILD) if False else tikz
         wrapper.write_text(
             "\\documentclass[tikz,border=6pt]{standalone}\n"
-            "\\usepackage{amsmath,amssymb,mathtools,xcolor}\n"
+            "\\usepackage{amsmath,amssymb,mathtools,xcolor,graphicx}\n"
             "\\usepackage{tikz}\n"
             "\\input{components.tex}\n"
             "\\begin{document}\n"
@@ -43,6 +57,7 @@ def main() -> None:
             encoding="utf8",
         )
         if not run(["pdflatex", "-interaction=nonstopmode", wrapper.name], BUILD):
+            print_latex_error(BUILD / f"{key}.log")
             continue
         pdf = BUILD / f"{key}.pdf"
         svg = SVG_OUT / f"{key}.svg"
