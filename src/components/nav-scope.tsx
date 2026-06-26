@@ -10,6 +10,11 @@ const scopes = [
   { value: "incorrect", label: "Incorrect" },
   { value: "unclear", label: "Unclear" },
   { value: "verified", label: "Verified" },
+  { value: "exclude_unverified", label: "Exclude unverified" },
+  { value: "exclude_needs_review", label: "Exclude needs review" },
+  { value: "exclude_incorrect", label: "Exclude incorrect" },
+  { value: "exclude_unclear", label: "Exclude unclear" },
+  { value: "exclude_verified", label: "Exclude verified" },
 ];
 
 export function normalizeNavScope(scope?: string) {
@@ -23,6 +28,7 @@ export function scopedHref(base: string, scope: string) {
 export function matchesNavScope(status: string, scope: string) {
   if (scope === "all") return true;
   if (scope === "not_verified") return status !== "verified";
+  if (scope.startsWith("exclude_")) return status !== scope.replace("exclude_", "");
   return status === scope;
 }
 
@@ -32,7 +38,7 @@ export function NavScopeChooser({ currentScope, basePath }: { currentScope: stri
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-wide text-stone-500">Navigation scope</p>
-          <p className="mt-1 text-sm text-stone-600">Previous/Next will only move through this status group.</p>
+          <p className="mt-1 text-sm text-stone-600">Previous/Next can include only a status or exclude a selected status.</p>
         </div>
         <form action={basePath} className="flex flex-wrap items-center gap-2">
           <select
