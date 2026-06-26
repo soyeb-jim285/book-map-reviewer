@@ -29,7 +29,7 @@ export default async function FigureDetailPage({ params, searchParams }: { param
       <PageHeader eyebrow={item.sourceLabel} title={`Fig ${item.figureNumber}: ${item.figureKey}`} description="Compare the original cropped figure with the rendered TikZ redraw." actions={<><Button asChild variant="secondary"><Link href="/figures">Back</Link></Button>{prev ? <Button asChild variant="secondary"><Link href={scopedHref(`/figures/${prev.id}`, navScope)}>Previous</Link></Button> : null}{next ? <Button asChild><Link href={scopedHref(`/figures/${next.id}`, navScope)}>Next</Link></Button> : null}</>} />
       <NavScopeChooser currentScope={navScope} basePath={`/figures/${item.id}`} />
       <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
-        <section className="grid gap-4 lg:grid-cols-2">
+        <section className="grid items-start gap-4 lg:grid-cols-2">
           <ImagePanel title="Original crop" src={originalSrc} />
           <ImagePanel title="Rendered TikZ" src={redrawnSrc} />
         </section>
@@ -44,7 +44,7 @@ export default async function FigureDetailPage({ params, searchParams }: { param
 }
 
 function ImagePanel({ title, src }: { title: string; src: string }) {
-  return <Card className="overflow-hidden"><div className="flex items-center justify-between border-b border-stone-200 px-4 py-3"><CardTitle className="text-base">{title}</CardTitle><Button asChild variant="ghost" size="sm"><a href={src} target="_blank">Open</a></Button></div><div className="grid min-h-[68vh] place-items-center overflow-auto bg-stone-100 p-4"><img src={src} alt={title} className="max-h-none max-w-full rounded-xl bg-white shadow-sm" /></div></Card>;
+  return <Card className="max-w-full justify-self-start overflow-hidden"><div className="flex items-center justify-between gap-3 border-b border-stone-200 px-4 py-3"><CardTitle className="text-base">{title}</CardTitle><Button asChild variant="ghost" size="sm"><a href={src} target="_blank">Open</a></Button></div><div className="overflow-auto bg-stone-100 p-2"><img src={src} alt={title} className="block h-auto max-w-full rounded-xl bg-white shadow-sm" /></div></Card>;
 }
 
 function Info({ label, value }: { label: string; value: React.ReactNode }) {
