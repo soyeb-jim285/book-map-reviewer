@@ -6,6 +6,7 @@ import { BookReviewForm } from "@/components/review-form";
 import { getBookMap, getBookMaps } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DetailNav } from "@/components/detail-nav";
 
 export default async function BookMapDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -29,6 +30,16 @@ export default async function BookMapDetailPage({ params }: { params: Promise<{ 
         </Card>
         <aside className="space-y-4">
           <Card>
+            <CardHeader><CardTitle>Original Question LaTeX</CardTitle></CardHeader>
+            <CardContent>
+              {item.questionLatex ? (
+                <pre className="max-h-80 overflow-auto whitespace-pre-wrap rounded-2xl bg-stone-950 p-4 text-xs leading-6 text-stone-50">{item.questionLatex}</pre>
+              ) : (
+                <p className="rounded-2xl bg-stone-50 p-4 text-sm text-stone-500">No matching question text found in questions_by_topic.tex.</p>
+              )}
+            </CardContent>
+          </Card>
+          <Card>
             <CardHeader><CardTitle>Evidence</CardTitle></CardHeader>
             <CardContent><p className="rounded-2xl bg-amber-50 p-4 text-sm leading-7 text-stone-800">{item.evidence}</p>
             <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
@@ -41,6 +52,7 @@ export default async function BookMapDetailPage({ params }: { params: Promise<{ 
           <BookReviewForm mappingId={item.id} initial={item.review} />
         </aside>
       </div>
+      <DetailNav backHref="/book-maps" previousHref={prev ? `/book-maps/${prev.id}` : undefined} nextHref={next ? `/book-maps/${next.id}` : undefined} previousLabel={prev?.source ?? "Previous"} nextLabel={next?.source ?? "Next"} />
     </AppShell>
   );
 }

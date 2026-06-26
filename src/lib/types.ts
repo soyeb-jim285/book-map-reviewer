@@ -23,6 +23,7 @@ export type BookMapItem = {
   printedPage: number | null;
   pdfPage: number | null;
   solutionPdfPage: number | null;
+  questionLatex?: string | null;
   evidence: string;
   review: BookMapReview;
 };

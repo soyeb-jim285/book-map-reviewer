@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { BOOK_MAP_TEX, FIGURE_COMPARISON_TEX, FIGURES_DIR } from "./paths";
+import { BOOK_MAP_TEX, FIGURE_COMPARISON_TEX, FIGURES_DIR, QUESTIONS_BY_TOPIC_TEX } from "./paths";
 import type { BookMapItem, FigureItem, MatchType } from "./types";
 
 function cleanTex(value: string) {
@@ -63,8 +63,52 @@ function parsePages(value: string) {
   };
 }
 
+function sourceBase(source: string) {
+  return source
+    .replace(/\s*\([a-z]+\)$/i, "")
+    .replace(/\s*\([^)]+copy[^)]*\)/i, " (copy)")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+export function parseQuestionsByTopic(texPath = QUESTIONS_BY_TOPIC_TEX) {
+  const text = fs.readFileSync(texPath, "utf8");
+  const questions = new Map<string, string[]>();
+  const lines = text.split(/\r?\n/);
+  let currentSource: string | null = null;
+  let currentBlock: string[] = [];
+
+  function flush() {
+    if (!currentSource || currentBlock.length === 0) return;
+    const latex = currentBlock.join("\n").trim();
+    const keys = [sourceBase(currentSource), sourceBase(currentSource.replace(/\([a-z]+\)$/i, ""))];
+    for (const key of keys) {
+      if (!questions.has(key)) questions.set(key, []);
+      const bucket = questions.get(key)!;
+      if (!bucket.includes(latex)) bucket.push(latex);
+    }
+  }
+
+  for (const line of lines) {
+    const match = line.match(/^\\q\{[^}]+\}\\srctag\{([^}]+)\}/);
+    if (match) {
+      flush();
+      currentSource = cleanTex(match[1]);
+      currentBlock = [line.trim()];
+      continue;
+    }
+
+    if (currentSource) currentBlock.push(line);
+  }
+  flush();
+
+  return questions;
+}
+
 export function parseBookMap(texPath = BOOK_MAP_TEX): BookMapItem[] {
   const text = fs.readFileSync(texPath, "utf8");
+  const questionBySource = fs.existsSync(QUESTIONS_BY_TOPIC_TEX) ? parseQuestionsByTopic() : new Map<string, string[]>();
   const rows: BookMapItem[] = [];
   let section = "Uncategorized";
 
@@ -82,6 +126,7 @@ export function parseBookMap(texPath = BOOK_MAP_TEX): BookMapItem[] {
     const source = cleanTex(parts[0]);
     const reference = cleanTex(parts[2]);
     const pages = parsePages(parts[3]);
+    const questionLatex = questionBySource.get(sourceBase(source))?.join("\n\n% --- also appears as ---\n\n") ?? null;
     rows.push({
       id: stableId("book", `${source}|${section}|${reference}|${parts[3]}`),
       source,
@@ -90,6 +135,7 @@ export function parseBookMap(texPath = BOOK_MAP_TEX): BookMapItem[] {
       bookShortName: parseBookShortName(reference),
       reference,
       ...pages,
+      questionLatex,
       evidence: cleanTex(parts.slice(4).join(" & ")),
       review: { status: "unverified", note: "" },
     });

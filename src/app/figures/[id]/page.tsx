@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { getFigure, getFigures } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DetailNav } from "@/components/detail-nav";
 
 export default async function FigureDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -30,6 +31,7 @@ export default async function FigureDetailPage({ params }: { params: Promise<{ i
           <FigureReviewForm figureId={item.id} initial={item.review} />
         </aside>
       </div>
+      <DetailNav backHref="/figures" previousHref={prev ? `/figures/${prev.id}` : undefined} nextHref={next ? `/figures/${next.id}` : undefined} previousLabel={prev ? `Fig ${prev.figureNumber}` : "Previous"} nextLabel={next ? `Fig ${next.figureNumber}` : "Next"} />
     </AppShell>
   );
 }

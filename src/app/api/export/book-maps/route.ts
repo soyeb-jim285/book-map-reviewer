@@ -12,6 +12,7 @@ export async function GET() {
     printed_page: item.printedPage,
     pdf_page: item.pdfPage,
     solution_pdf_page: item.solutionPdfPage,
+    question_latex: item.questionLatex,
     evidence: item.evidence,
     review_status: item.review.status,
     review_note: item.review.note,
