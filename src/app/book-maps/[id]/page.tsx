@@ -7,21 +7,26 @@ import { getBookMap, getBookMaps } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DetailNav } from "@/components/detail-nav";
+import { matchesNavScope, NavScopeChooser, normalizeNavScope, scopedHref } from "@/components/nav-scope";
 
 export const dynamic = "force-dynamic";
 
-export default async function BookMapDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function BookMapDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ scope?: string }> }) {
   const { id } = await params;
+  const { scope } = await searchParams;
   const [item, all] = await Promise.all([getBookMap(id), getBookMaps()]);
   if (!item) notFound();
-  const index = all.findIndex((entry) => entry.id === id);
-  const prev = all[index - 1];
-  const next = all[index + 1];
+  const navScope = normalizeNavScope(scope);
+  const scopedItems = all.filter((entry) => matchesNavScope(entry.review.status, navScope));
+  const index = scopedItems.findIndex((entry) => entry.id === id);
+  const prev = scopedItems[index - 1];
+  const next = scopedItems[index + 1];
   const pdfSrc = item.bookR2Key ? `/api/assets/${item.bookR2Key}#page=${item.pdfPage ?? 1}` : null;
 
   return (
     <AppShell>
-      <PageHeader eyebrow={item.section} title={item.source} description={item.reference} actions={<><Button asChild variant="secondary"><Link href="/book-maps">Back</Link></Button>{prev ? <Button asChild variant="secondary"><Link href={`/book-maps/${prev.id}`}>Previous</Link></Button> : null}{next ? <Button asChild><Link href={`/book-maps/${next.id}`}>Next</Link></Button> : null}</>} />
+      <PageHeader eyebrow={item.section} title={item.source} description={item.reference} actions={<><Button asChild variant="secondary"><Link href="/book-maps">Back</Link></Button>{prev ? <Button asChild variant="secondary"><Link href={scopedHref(`/book-maps/${prev.id}`, navScope)}>Previous</Link></Button> : null}{next ? <Button asChild><Link href={scopedHref(`/book-maps/${next.id}`, navScope)}>Next</Link></Button> : null}</>} />
+      <NavScopeChooser currentScope={navScope} basePath={`/book-maps/${item.id}`} />
       <div className="grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
         <Card className="min-h-[72vh] overflow-hidden">
           <div className="flex items-center justify-between border-b border-stone-200 px-4 py-3">
@@ -71,7 +76,7 @@ export default async function BookMapDetailPage({ params }: { params: Promise<{ 
           <BookReviewForm mappingId={item.id} initial={item.review} />
         </aside>
       </div>
-      <DetailNav backHref="/book-maps" previousHref={prev ? `/book-maps/${prev.id}` : undefined} nextHref={next ? `/book-maps/${next.id}` : undefined} previousLabel={prev?.source ?? "Previous"} nextLabel={next?.source ?? "Next"} />
+      <DetailNav backHref="/book-maps" previousHref={prev ? scopedHref(`/book-maps/${prev.id}`, navScope) : undefined} nextHref={next ? scopedHref(`/book-maps/${next.id}`, navScope) : undefined} previousLabel={prev?.source ?? "Previous"} nextLabel={next?.source ?? "Next"} />
     </AppShell>
   );
 }

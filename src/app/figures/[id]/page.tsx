@@ -7,22 +7,27 @@ import { getFigure, getFigures } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DetailNav } from "@/components/detail-nav";
+import { matchesNavScope, NavScopeChooser, normalizeNavScope, scopedHref } from "@/components/nav-scope";
 
 export const dynamic = "force-dynamic";
 
-export default async function FigureDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function FigureDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ scope?: string }> }) {
   const { id } = await params;
+  const { scope } = await searchParams;
   const [item, all] = await Promise.all([getFigure(id), getFigures()]);
   if (!item) notFound();
-  const index = all.findIndex((entry) => entry.id === id);
-  const prev = all[index - 1];
-  const next = all[index + 1];
+  const navScope = normalizeNavScope(scope);
+  const scopedItems = all.filter((entry) => matchesNavScope(entry.review.status, navScope));
+  const index = scopedItems.findIndex((entry) => entry.id === id);
+  const prev = scopedItems[index - 1];
+  const next = scopedItems[index + 1];
   const originalSrc = `/api/assets/${item.originalImageKey}`;
   const redrawnSrc = `/api/assets/${item.redrawnSvgKey ?? item.redrawnPngKey}`;
 
   return (
     <AppShell>
-      <PageHeader eyebrow={item.sourceLabel} title={`Fig ${item.figureNumber}: ${item.figureKey}`} description="Compare the original cropped figure with the rendered TikZ redraw." actions={<><Button asChild variant="secondary"><Link href="/figures">Back</Link></Button>{prev ? <Button asChild variant="secondary"><Link href={`/figures/${prev.id}`}>Previous</Link></Button> : null}{next ? <Button asChild><Link href={`/figures/${next.id}`}>Next</Link></Button> : null}</>} />
+      <PageHeader eyebrow={item.sourceLabel} title={`Fig ${item.figureNumber}: ${item.figureKey}`} description="Compare the original cropped figure with the rendered TikZ redraw." actions={<><Button asChild variant="secondary"><Link href="/figures">Back</Link></Button>{prev ? <Button asChild variant="secondary"><Link href={scopedHref(`/figures/${prev.id}`, navScope)}>Previous</Link></Button> : null}{next ? <Button asChild><Link href={scopedHref(`/figures/${next.id}`, navScope)}>Next</Link></Button> : null}</>} />
+      <NavScopeChooser currentScope={navScope} basePath={`/figures/${item.id}`} />
       <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
         <section className="grid gap-4 lg:grid-cols-2">
           <ImagePanel title="Original crop" src={originalSrc} />
@@ -33,7 +38,7 @@ export default async function FigureDetailPage({ params }: { params: Promise<{ i
           <FigureReviewForm figureId={item.id} initial={item.review} />
         </aside>
       </div>
-      <DetailNav backHref="/figures" previousHref={prev ? `/figures/${prev.id}` : undefined} nextHref={next ? `/figures/${next.id}` : undefined} previousLabel={prev ? `Fig ${prev.figureNumber}` : "Previous"} nextLabel={next ? `Fig ${next.figureNumber}` : "Next"} />
+      <DetailNav backHref="/figures" previousHref={prev ? scopedHref(`/figures/${prev.id}`, navScope) : undefined} nextHref={next ? scopedHref(`/figures/${next.id}`, navScope) : undefined} previousLabel={prev ? `Fig ${prev.figureNumber}` : "Previous"} nextLabel={next ? `Fig ${next.figureNumber}` : "Next"} />
     </AppShell>
   );
 }
