@@ -1,0 +1,1 @@
+ALTER TABLE "book_mappings" ADD COLUMN "question_preview_keys" jsonb DEFAULT '[]'::jsonb NOT NULL;

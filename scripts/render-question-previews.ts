@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { parseBookMap } from "../src/lib/parse";
+import { parseQuestionsByTopic, type QuestionEntry } from "../src/lib/parse";
 import { FIGURES_DIR, QUESTIONS_OUTPUTS_DIR } from "../src/lib/paths";
 
 const buildDir = path.join(process.cwd(), ".question-build");
@@ -60,15 +60,17 @@ ${stripQuestionWrapper(questionLatex)}
 
 function main() {
   prepareBuildDir();
-  const items = parseBookMap().filter((item) => item.questionLatex && item.questionPreviewKey);
-  const seen = new Map<string, string>();
-  for (const item of items) seen.set(item.questionPreviewKey!, item.questionLatex!);
+  const questions = parseQuestionsByTopic();
+  const seen = new Map<string, QuestionEntry>();
+  for (const entries of questions.values()) {
+    for (const entry of entries) seen.set(entry.previewKey, entry);
+  }
 
   let rendered = 0;
-  for (const [key, questionLatex] of seen.entries()) {
+  for (const [key, entry] of seen.entries()) {
     const name = path.basename(key, ".png");
     const texPath = path.join(buildDir, `${name}.tex`);
-    fs.writeFileSync(texPath, wrapper(questionLatex), "utf8");
+    fs.writeFileSync(texPath, wrapper(entry.latex), "utf8");
     if (!run("pdflatex", ["-interaction=nonstopmode", `${name}.tex`], buildDir)) {
       printLatexError(path.join(buildDir, `${name}.log`));
       continue;

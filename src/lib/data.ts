@@ -47,6 +47,7 @@ export async function getBookMaps(): Promise<BookMapItem[]> {
     solutionPdfPage: mapping.solutionPdfPage,
     questionLatex: mapping.questionLatex,
     questionPreviewKey: mapping.questionPreviewKey,
+    questionPreviewKeys: mapping.questionPreviewKeys,
     evidence: mapping.evidence,
     review: review ?? { status: "unverified", note: "" },
   }));

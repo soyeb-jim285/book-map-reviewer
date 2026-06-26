@@ -27,6 +27,7 @@ export const bookMappings = pgTable("book_mappings", {
   solutionPdfPage: integer("solution_pdf_page"),
   questionLatex: text("question_latex"),
   questionPreviewKey: text("question_preview_key"),
+  questionPreviewKeys: jsonb("question_preview_keys").$type<string[]>().default([]).notNull(),
   evidence: text("evidence").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

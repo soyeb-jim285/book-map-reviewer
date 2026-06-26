@@ -1,0 +1,519 @@
+{
+  "id": "6fd0e24f-343b-4b75-a85b-8c73af74d3bb",
+  "prevId": "963f2f4c-20e3-493b-9b20-38163c1dcab8",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.book_mapping_reviews": {
+      "name": "book_mapping_reviews",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "mapping_id": {
+          "name": "mapping_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "review_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'unverified'"
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "corrected_book": {
+          "name": "corrected_book",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "corrected_reference": {
+          "name": "corrected_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "corrected_printed_page": {
+          "name": "corrected_printed_page",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "corrected_pdf_page": {
+          "name": "corrected_pdf_page",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "book_mapping_reviews_mapping_id_book_mappings_id_fk": {
+          "name": "book_mapping_reviews_mapping_id_book_mappings_id_fk",
+          "tableFrom": "book_mapping_reviews",
+          "tableTo": "book_mappings",
+          "columnsFrom": [
+            "mapping_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "book_mapping_reviews_mapping_id_unique": {
+          "name": "book_mapping_reviews_mapping_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mapping_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.book_mappings": {
+      "name": "book_mappings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "section": {
+          "name": "section",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "match_type": {
+          "name": "match_type",
+          "type": "match_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "book_short_name": {
+          "name": "book_short_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "book_id": {
+          "name": "book_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reference": {
+          "name": "reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "printed_page": {
+          "name": "printed_page",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pdf_page": {
+          "name": "pdf_page",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "solution_pdf_page": {
+          "name": "solution_pdf_page",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "question_latex": {
+          "name": "question_latex",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "question_preview_key": {
+          "name": "question_preview_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "question_preview_keys": {
+          "name": "question_preview_keys",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "evidence": {
+          "name": "evidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "book_mappings_source_reference_idx": {
+          "name": "book_mappings_source_reference_idx",
+          "columns": [
+            {
+              "expression": "source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "reference",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "book_mappings_book_id_books_id_fk": {
+          "name": "book_mappings_book_id_books_id_fk",
+          "tableFrom": "book_mappings",
+          "tableTo": "books",
+          "columnsFrom": [
+            "book_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.books": {
+      "name": "books",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "short_name": {
+          "name": "short_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "edition": {
+          "name": "edition",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "r2_key": {
+          "name": "r2_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "books_short_name_unique": {
+          "name": "books_short_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "short_name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.figure_reviews": {
+      "name": "figure_reviews",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "figure_id": {
+          "name": "figure_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "review_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'unverified'"
+        },
+        "issue_tags": {
+          "name": "issue_tags",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "figure_reviews_figure_id_figures_id_fk": {
+          "name": "figure_reviews_figure_id_figures_id_fk",
+          "tableFrom": "figure_reviews",
+          "tableTo": "figures",
+          "columnsFrom": [
+            "figure_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "figure_reviews_figure_id_unique": {
+          "name": "figure_reviews_figure_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "figure_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.figures": {
+      "name": "figures",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "figure_number": {
+          "name": "figure_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "figure_key": {
+          "name": "figure_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_label": {
+          "name": "source_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "question_label": {
+          "name": "question_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "original_image_key": {
+          "name": "original_image_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "redrawn_svg_key": {
+          "name": "redrawn_svg_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "redrawn_png_key": {
+          "name": "redrawn_png_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tikz_source_path": {
+          "name": "tikz_source_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "figures_figure_key_unique": {
+          "name": "figures_figure_key_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "figure_key"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.match_type": {
+      "name": "match_type",
+      "schema": "public",
+      "values": [
+        "exact",
+        "close",
+        "similar",
+        "topic",
+        "none"
+      ]
+    },
+    "public.review_status": {
+      "name": "review_status",
+      "schema": "public",
+      "values": [
+        "unverified",
+        "verified",
+        "needs_review",
+        "incorrect",
+        "unclear"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

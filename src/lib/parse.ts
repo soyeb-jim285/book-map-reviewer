@@ -3,6 +3,12 @@ import path from "node:path";
 import { BOOK_MAP_TEX, FIGURE_COMPARISON_TEX, FIGURES_DIR, QUESTIONS_BY_TOPIC_TEX } from "./paths";
 import type { BookMapItem, FigureItem, MatchType } from "./types";
 
+export type QuestionEntry = {
+  source: string;
+  latex: string;
+  previewKey: string;
+};
+
 function cleanTex(value: string) {
   return value
     .replace(/\\textasciicircum\{\}/g, "^")
@@ -74,7 +80,7 @@ function sourceBase(source: string) {
 
 export function parseQuestionsByTopic(texPath = QUESTIONS_BY_TOPIC_TEX) {
   const text = fs.readFileSync(texPath, "utf8");
-  const questions = new Map<string, string[]>();
+  const questions = new Map<string, QuestionEntry[]>();
   const lines = text.split(/\r?\n/);
   let currentSource: string | null = null;
   let currentBlock: string[] = [];
@@ -82,11 +88,16 @@ export function parseQuestionsByTopic(texPath = QUESTIONS_BY_TOPIC_TEX) {
   function flush() {
     if (!currentSource || currentBlock.length === 0) return;
     const latex = currentBlock.join("\n").trim();
+    const entry: QuestionEntry = {
+      source: currentSource,
+      latex,
+      previewKey: `questions/rendered/${stableId("question", currentSource.toLowerCase())}.png`,
+    };
     const keys = [sourceBase(currentSource), sourceBase(currentSource.replace(/\([a-z]+\)$/i, ""))];
     for (const key of keys) {
       if (!questions.has(key)) questions.set(key, []);
       const bucket = questions.get(key)!;
-      if (!bucket.includes(latex)) bucket.push(latex);
+      if (!bucket.some((item) => item.previewKey === entry.previewKey)) bucket.push(entry);
     }
   }
 
@@ -115,7 +126,7 @@ export function parseQuestionsByTopic(texPath = QUESTIONS_BY_TOPIC_TEX) {
 
 export function parseBookMap(texPath = BOOK_MAP_TEX): BookMapItem[] {
   const text = fs.readFileSync(texPath, "utf8");
-  const questionBySource = fs.existsSync(QUESTIONS_BY_TOPIC_TEX) ? parseQuestionsByTopic() : new Map<string, string[]>();
+  const questionBySource = fs.existsSync(QUESTIONS_BY_TOPIC_TEX) ? parseQuestionsByTopic() : new Map<string, QuestionEntry[]>();
   const rows: BookMapItem[] = [];
   let section = "Uncategorized";
 
@@ -133,7 +144,9 @@ export function parseBookMap(texPath = BOOK_MAP_TEX): BookMapItem[] {
     const source = cleanTex(parts[0]);
     const reference = cleanTex(parts[2]);
     const pages = parsePages(parts[3]);
-    const questionLatex = questionBySource.get(sourceBase(source))?.join("\n\n% --- also appears as ---\n\n") ?? null;
+    const questionEntries = questionBySource.get(sourceBase(source)) ?? [];
+    const questionLatex = questionEntries.map((entry) => entry.latex).join("\n\n% --- also appears as ---\n\n") || null;
+    const questionPreviewKeys = questionEntries.map((entry) => entry.previewKey);
     rows.push({
       id: stableId("book", `${source}|${section}|${reference}|${parts[3]}`),
       source,
@@ -143,7 +156,8 @@ export function parseBookMap(texPath = BOOK_MAP_TEX): BookMapItem[] {
       reference,
       ...pages,
       questionLatex,
-      questionPreviewKey: questionLatex ? `questions/rendered/${stableId("question", sourceBase(source))}.png` : null,
+      questionPreviewKey: questionPreviewKeys[0] ?? null,
+      questionPreviewKeys,
       evidence: cleanTex(parts.slice(4).join(" & ")),
       review: { status: "unverified", note: "" },
     });

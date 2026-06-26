@@ -39,10 +39,14 @@ async function main() {
     if (await uploadFile(figure.redrawnPngKey, redrawnPng)) uploaded += 1;
   }
 
+  const uploadedQuestionKeys = new Set<string>();
   for (const mapping of parseBookMap()) {
-    if (!mapping.questionPreviewKey) continue;
-    const local = path.join(process.cwd(), "public", "review-assets", mapping.questionPreviewKey);
-    if (await uploadFile(mapping.questionPreviewKey, local)) uploaded += 1;
+    for (const key of mapping.questionPreviewKeys ?? []) {
+      if (uploadedQuestionKeys.has(key)) continue;
+      uploadedQuestionKeys.add(key);
+      const local = path.join(process.cwd(), "public", "review-assets", key);
+      if (await uploadFile(key, local)) uploaded += 1;
+    }
   }
 
   console.log(`Uploaded ${uploaded} assets.`);

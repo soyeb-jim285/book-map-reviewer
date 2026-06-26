@@ -14,6 +14,7 @@ export async function GET() {
     solution_pdf_page: item.solutionPdfPage,
     question_latex: item.questionLatex,
     question_preview_key: item.questionPreviewKey,
+    question_preview_keys: item.questionPreviewKeys,
     evidence: item.evidence,
     review_status: item.review.status,
     review_note: item.review.note,

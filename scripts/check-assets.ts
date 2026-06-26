@@ -7,7 +7,7 @@ async function main() {
   const keys = [
     ...defaultBooks.map((book) => book.r2Key),
     ...parseFigureComparison().flatMap((figure) => [figure.originalImageKey, figure.redrawnSvgKey, figure.redrawnPngKey].filter(Boolean) as string[]),
-    ...parseBookMap().map((mapping) => mapping.questionPreviewKey).filter(Boolean) as string[],
+    ...parseBookMap().flatMap((mapping) => mapping.questionPreviewKeys ?? []),
   ];
   let missing = 0;
   for (const key of keys) {

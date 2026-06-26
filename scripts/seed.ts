@@ -34,6 +34,7 @@ async function main() {
         solutionPdfPage: item.solutionPdfPage,
         questionLatex: item.questionLatex,
         questionPreviewKey: item.questionPreviewKey,
+        questionPreviewKeys: item.questionPreviewKeys ?? [],
         evidence: item.evidence,
         updatedAt: new Date(),
       })
@@ -49,6 +50,7 @@ async function main() {
           solutionPdfPage: item.solutionPdfPage,
           questionLatex: item.questionLatex,
           questionPreviewKey: item.questionPreviewKey,
+          questionPreviewKeys: item.questionPreviewKeys ?? [],
           evidence: item.evidence,
           updatedAt: new Date(),
         },
