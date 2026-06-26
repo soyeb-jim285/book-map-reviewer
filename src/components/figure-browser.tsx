@@ -27,6 +27,10 @@ export function FigureBrowser({ items }: { items: FigureItem[] }) {
         {filtered.map((item) => (
           <Link key={item.id} href={`/figures/${item.id}`}>
           <Card className="h-full transition hover:-translate-y-0.5 hover:shadow-md">
+            <div className="grid grid-cols-2 gap-2 border-b border-stone-100 p-3">
+              <PreviewImage title="Original" src={`/api/assets/${item.originalImageKey}`} />
+              <PreviewImage title="Redrawn" src={`/api/assets/${item.redrawnSvgKey ?? item.redrawnPngKey}`} />
+            </div>
             <CardHeader><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-wide text-stone-500">Fig {item.figureNumber}</p><CardTitle className="mt-1 text-lg">{item.figureKey}</CardTitle></div><StatusBadge status={item.review.status} /></div></CardHeader>
             <CardContent><p className="text-sm text-stone-600">{item.sourceLabel}</p>
             {item.review.issueTags.length ? <p className="mt-3 text-xs font-bold text-amber-700">{item.review.issueTags.join(", ")}</p> : null}
@@ -34,6 +38,17 @@ export function FigureBrowser({ items }: { items: FigureItem[] }) {
           </Card>
           </Link>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function PreviewImage({ title, src }: { title: string; src: string }) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50">
+      <div className="border-b border-stone-200 bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wide text-stone-500">{title}</div>
+      <div className="grid h-32 place-items-center overflow-hidden p-2">
+        <img src={src} alt={`${title} preview`} className="max-h-full max-w-full object-contain" loading="lazy" />
       </div>
     </div>
   );
