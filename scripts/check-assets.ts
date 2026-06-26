@@ -1,5 +1,5 @@
 import { loadEnv } from "../src/lib/load-env";
-import { defaultBooks, parseFigureComparison } from "../src/lib/parse";
+import { defaultBooks, parseBookMap, parseFigureComparison } from "../src/lib/parse";
 import { assetExists } from "../src/lib/r2";
 
 async function main() {
@@ -7,6 +7,7 @@ async function main() {
   const keys = [
     ...defaultBooks.map((book) => book.r2Key),
     ...parseFigureComparison().flatMap((figure) => [figure.originalImageKey, figure.redrawnSvgKey, figure.redrawnPngKey].filter(Boolean) as string[]),
+    ...parseBookMap().map((mapping) => mapping.questionPreviewKey).filter(Boolean) as string[],
   ];
   let missing = 0;
   for (const key of keys) {

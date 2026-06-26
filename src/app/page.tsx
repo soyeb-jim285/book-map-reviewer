@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const [bookMaps, figures] = await Promise.all([getBookMaps(), getFigures()]);
   const verifiedBooks = bookMaps.filter((item) => item.review.status === "verified").length;

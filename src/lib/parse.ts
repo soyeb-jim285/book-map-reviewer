@@ -99,6 +99,13 @@ export function parseQuestionsByTopic(texPath = QUESTIONS_BY_TOPIC_TEX) {
       continue;
     }
 
+    if (currentSource && (/^\\end\{qlist\}/.test(line) || /^\\clearpage/.test(line) || /^\\section/.test(line))) {
+      flush();
+      currentSource = null;
+      currentBlock = [];
+      continue;
+    }
+
     if (currentSource) currentBlock.push(line);
   }
   flush();
@@ -136,6 +143,7 @@ export function parseBookMap(texPath = BOOK_MAP_TEX): BookMapItem[] {
       reference,
       ...pages,
       questionLatex,
+      questionPreviewKey: questionLatex ? `questions/rendered/${stableId("question", sourceBase(source))}.png` : null,
       evidence: cleanTex(parts.slice(4).join(" & ")),
       review: { status: "unverified", note: "" },
     });

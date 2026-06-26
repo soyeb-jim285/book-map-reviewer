@@ -24,6 +24,7 @@ export type BookMapItem = {
   pdfPage: number | null;
   solutionPdfPage: number | null;
   questionLatex?: string | null;
+  questionPreviewKey?: string | null;
   evidence: string;
   review: BookMapReview;
 };

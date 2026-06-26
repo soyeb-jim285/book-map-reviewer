@@ -13,6 +13,7 @@ export async function GET() {
     pdf_page: item.pdfPage,
     solution_pdf_page: item.solutionPdfPage,
     question_latex: item.questionLatex,
+    question_preview_key: item.questionPreviewKey,
     evidence: item.evidence,
     review_status: item.review.status,
     review_note: item.review.note,

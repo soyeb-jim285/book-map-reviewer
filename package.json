@@ -12,7 +12,8 @@
     "seed": "tsx scripts/seed.ts",
     "upload:assets": "tsx scripts/upload-assets.ts",
     "check:assets": "tsx scripts/check-assets.ts",
-    "render:figures": "uv run scripts/render-redrawn-figures.py"
+    "render:figures": "uv run scripts/render-redrawn-figures.py",
+    "render:questions": "tsx scripts/render-question-previews.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1075.0",

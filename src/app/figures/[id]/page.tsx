@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DetailNav } from "@/components/detail-nav";
 
+export const dynamic = "force-dynamic";
+
 export default async function FigureDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [item, all] = await Promise.all([getFigure(id), getFigures()]);

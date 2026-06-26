@@ -36,6 +36,7 @@ export function BookReviewForm({
     <Card>
       <CardHeader><CardTitle>Your Review</CardTitle></CardHeader>
       <CardContent>
+      <p className="text-sm font-semibold text-stone-500">Status buttons auto-save immediately. Use “Save notes” only after editing notes or corrected fields.</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {statuses.map((status) => (
           <Button key={status} variant={form.status === status ? "default" : "secondary"} size="sm" onClick={() => { const next = { ...form, status }; setForm(next); save(next); }}>{titleCase(status)}</Button>
@@ -84,6 +85,7 @@ export function FigureReviewForm({ figureId, initial }: { figureId: string; init
     <Card>
       <CardHeader><CardTitle>Figure Review</CardTitle></CardHeader>
       <CardContent>
+      <p className="text-sm font-semibold text-stone-500">Status buttons and issue tags auto-save immediately. Use “Save notes” after editing the note field.</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {statuses.map((status) => (
           <Button key={status} variant={form.status === status ? "default" : "secondary"} size="sm" onClick={() => { const next = { ...form, status }; setForm(next); save(next); }}>{titleCase(status)}</Button>

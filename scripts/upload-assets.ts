@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { loadEnv } from "../src/lib/load-env";
 import { BOOKS_DIR, PROJECT_ROOT } from "../src/lib/paths";
-import { defaultBooks, parseFigureComparison } from "../src/lib/parse";
+import { defaultBooks, parseBookMap, parseFigureComparison } from "../src/lib/parse";
 import { uploadAsset } from "../src/lib/r2";
 
 function contentType(file: string) {
@@ -37,6 +37,12 @@ async function main() {
     if (await uploadFile(figure.originalImageKey, original)) uploaded += 1;
     if (figure.redrawnSvgKey && (await uploadFile(figure.redrawnSvgKey, redrawnSvg))) uploaded += 1;
     if (await uploadFile(figure.redrawnPngKey, redrawnPng)) uploaded += 1;
+  }
+
+  for (const mapping of parseBookMap()) {
+    if (!mapping.questionPreviewKey) continue;
+    const local = path.join(process.cwd(), "public", "review-assets", mapping.questionPreviewKey);
+    if (await uploadFile(mapping.questionPreviewKey, local)) uploaded += 1;
   }
 
   console.log(`Uploaded ${uploaded} assets.`);

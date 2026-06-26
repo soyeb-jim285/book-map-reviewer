@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DetailNav } from "@/components/detail-nav";
 
+export const dynamic = "force-dynamic";
+
 export default async function BookMapDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [item, all] = await Promise.all([getBookMap(id), getBookMaps()]);
@@ -30,13 +32,18 @@ export default async function BookMapDetailPage({ params }: { params: Promise<{ 
         </Card>
         <aside className="space-y-4">
           <Card>
-            <CardHeader><CardTitle>Original Question LaTeX</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Original Question</CardTitle></CardHeader>
             <CardContent>
-              {item.questionLatex ? (
+              {item.questionPreviewKey ? (
+                <div className="overflow-auto rounded-2xl border border-stone-200 bg-stone-50 p-3">
+                  <img src={`/api/assets/${item.questionPreviewKey}`} alt={`Rendered question for ${item.source}`} className="max-w-full rounded-xl bg-white shadow-sm" />
+                </div>
+              ) : item.questionLatex ? (
                 <pre className="max-h-80 overflow-auto whitespace-pre-wrap rounded-2xl bg-stone-950 p-4 text-xs leading-6 text-stone-50">{item.questionLatex}</pre>
               ) : (
                 <p className="rounded-2xl bg-stone-50 p-4 text-sm text-stone-500">No matching question text found in questions_by_topic.tex.</p>
               )}
+              {item.questionLatex ? <details className="mt-3"><summary className="cursor-pointer text-sm font-black text-stone-600">Show raw LaTeX</summary><pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-2xl bg-stone-950 p-4 text-xs leading-6 text-stone-50">{item.questionLatex}</pre></details> : null}
             </CardContent>
           </Card>
           <Card>
