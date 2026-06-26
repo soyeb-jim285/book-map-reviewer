@@ -1,7 +1,9 @@
+import { loadEnv } from "../src/lib/load-env";
 import { defaultBooks, parseFigureComparison } from "../src/lib/parse";
 import { assetExists } from "../src/lib/r2";
 
 async function main() {
+  loadEnv();
   const keys = [
     ...defaultBooks.map((book) => book.r2Key),
     ...parseFigureComparison().flatMap((figure) => [figure.originalImageKey, figure.redrawnSvgKey, figure.redrawnPngKey].filter(Boolean) as string[]),

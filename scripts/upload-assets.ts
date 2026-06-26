@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { loadEnv } from "../src/lib/load-env";
 import { BOOKS_DIR, PROJECT_ROOT } from "../src/lib/paths";
 import { defaultBooks, parseFigureComparison } from "../src/lib/parse";
 import { uploadAsset } from "../src/lib/r2";
@@ -22,6 +23,7 @@ async function uploadFile(key: string, filePath: string) {
 }
 
 async function main() {
+  loadEnv();
   let uploaded = 0;
   for (const book of defaultBooks) {
     const local = book.localCandidates.map((candidate) => path.join(BOOKS_DIR, candidate)).find((candidate) => fs.existsSync(candidate));

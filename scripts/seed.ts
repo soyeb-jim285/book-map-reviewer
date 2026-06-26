@@ -1,9 +1,11 @@
 import { eq } from "drizzle-orm";
+import { loadEnv } from "../src/lib/load-env";
 import { getDb } from "../src/db";
 import { books, bookMappings, figures } from "../src/db/schema";
 import { defaultBooks, parseBookMap, parseFigureComparison } from "../src/lib/parse";
 
 async function main() {
+  loadEnv();
   const db = getDb();
   const bookIdByShortName = new Map<string, string>();
 
